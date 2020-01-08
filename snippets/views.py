@@ -186,7 +186,7 @@ from rest_framework import generics
 from django.contrib.auth.models import User
 from snippets.serializers import UserSerializer
 
-from rest_framework import permissions
+from rest_framework import permissions, renderers
 
 from snippets.permissions import IsOwnerOrReadOnly
 
@@ -214,6 +214,14 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SnippetSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                             IsOwnerOrReadOnly]
+
+class SnippetHighlight(generics.GenericAPIView):
+    queryset = Snippet.objects.all()
+    renderer_classes = [renderers.StaticHTMLRenderer]
+
+    def get(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
